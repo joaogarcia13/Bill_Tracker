@@ -10,25 +10,112 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: const Text('Home Page'),
       ),
-      body: Center(
-        child: Container(
-          height: 80,
-          width: 150,
-          decoration: BoxDecoration(
-              color: Colors.blue, borderRadius: BorderRadius.circular(10)),
-          child: TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Welcome',
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
+        body: Column(children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.blue, borderRadius: BorderRadius.circular(20)),
+                height: 50,
+                width: 300,
+                margin: const EdgeInsets.only(
+                    left: 50, right: 50, top: 15, bottom: 15),
+                child: TextButton(
+                  //onHover: (hasFocus) {
+                  // setState(() {
+                  //   hasFocus ? Colors.pink : Colors.green;
+                  // });
+                  // muda a cor do botao mas nao funciona
+                  //},
+                  onPressed: () {
+                    Navigator.push(
+                      //inserir autenticação aqui
+                        context,
+                        MaterialPageRoute(builder: (_) => HomePage()));
+                  },
+                  child: const Text(
+                    'Adicionar Despesa',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.blue, borderRadius: BorderRadius.circular(20)),
+                height: 50,
+                width: 300,
+                margin: const EdgeInsets.only(
+                    left: 50, right: 50, top: 15, bottom: 15),
+                child: TextButton(
+                  //onHover: (hasFocus) {
+                  // setState(() {
+                  //   hasFocus ? Colors.pink : Colors.green;
+                  // });
+                  // muda a cor do botao mas nao funciona
+                  //},
+                  onPressed: () {
+                    Navigator.push(
+                      //inserir autenticação aqui
+                        context,
+                        MaterialPageRoute(builder: (_) => HomePage()));
+                  },
+                  child: const Text(
+                    'Consultar Despesas do Mês',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.blue, borderRadius: BorderRadius.circular(20)),
+                height: 50,
+                width: 300,
+                margin: const EdgeInsets.only(
+                    left: 50, right: 50, top: 15, bottom: 15),
+                child: TextButton(
+                  //onHover: (hasFocus) {
+                  // setState(() {
+                  //   hasFocus ? Colors.pink : Colors.green;
+                  // });
+                  // muda a cor do botao mas nao funciona
+                  //},
+                  onPressed: () {
+                    Navigator.push(
+                      //inserir autenticação aqui
+                        context,
+                        MaterialPageRoute(builder: (_) => HomePage()));
+                  },
+                  child: const Text(
+                    'Definições ????',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ),
-    );
+          Container(//ROW 2
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(20.0),
+                  child: Table(
+                    border: TableBorder.all(color: Colors.black),
+                    children: const [
+                      TableRow(children: [
+                        Text('Cell 1'),
+                        Text('Cell 2'),
+                        Text('Cell 3'),
+                      ]),
+                      TableRow(children: [
+                        Text('Cell 4'),
+                        Text('Cell 5'),
+                        Text('Cell 6'),
+                      ])
+                    ],
+                  ),
+                )
+              ]),
+      );
   }
 }
