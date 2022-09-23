@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
                 // muda a cor do botao mas nao funciona
                 //},
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                       //inserir autenticação aqui
                       context,
                       MaterialPageRoute(builder: (_) => HomePage()));
