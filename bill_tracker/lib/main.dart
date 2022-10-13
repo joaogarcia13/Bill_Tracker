@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'HomePage.dart';
 
-//TODO mudar os campos de login para um form
 void main() {
   runApp(MyApp());
 }
@@ -22,6 +21,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +32,8 @@ class _LoginState extends State<Login> {
         title: const Text("Login"),
       ),
       body: Center(
+      child: Form(
+        key: _formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,23 +51,35 @@ class _LoginState extends State<Login> {
                         fit: BoxFit.contain)),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 50, right: 50, top: 15, bottom: 0),
-              child: TextField(
-                decoration: InputDecoration(
+            Padding(
+              padding: const EdgeInsets.only(left: 50, right: 50, top: 15, bottom: 0),
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'O Username não foi preenchido';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Email',
-                    hintText: 'Introduzir email válido como abc@gmail.com'),
+                    labelText: 'Username',
+                    hintText: 'Introduza o seu Username'),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 50, right: 50, top: 15, bottom: 0),
-              child: TextField(
+            Padding(
+              padding: const EdgeInsets.only(left: 50, right: 50, top: 15, bottom: 0),
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'A Password não foi preenchida';
+                  }
+                  return null;
+                },
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
-                    hintText: 'Introduza a sua Password.'),
+                    hintText: 'Introduza a sua Password'),
               ),
             ),
             Container(
@@ -81,10 +97,12 @@ class _LoginState extends State<Login> {
                 // muda a cor do botao mas nao funciona
                 //},
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.pushReplacement(
                       //inserir autenticação aqui
-                      context,
-                      MaterialPageRoute(builder: (_) => HomePage()));
+                        context,
+                        MaterialPageRoute(builder: (_) => HomePage()));
+                  }
                 },
                 child: const Text(
                   'Login',
@@ -95,6 +113,7 @@ class _LoginState extends State<Login> {
           ],
         ),
       ),
+    )
     );
   }
 }

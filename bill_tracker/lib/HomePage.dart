@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                                         TextFormField(
                                           validator: (value) {
                                             if (value == null || value.isEmpty) {
-                                              return 'O Valor está vazio';
+                                              return 'O Valor não foi preenchido';
                                             }else{
                                               try{
                                                 double.parse(value);
@@ -164,6 +164,19 @@ class _HomePageState extends State<HomePage> {
                                           decoration: const InputDecoration(
                                             labelText: 'Valor',
                                             icon: Icon(Icons.euro),
+                                          ),
+                                        ),
+                                        TextFormField(
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Designação não foi preenchida';
+                                            }
+                                            return null;
+                                          },
+                                          textAlign: TextAlign.center,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Designação',
+                                            icon: Icon(Icons.description),
                                           ),
                                         ),
                                         TextFormField(
