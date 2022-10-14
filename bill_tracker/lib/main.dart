@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mysql_client/mysql_client.dart';
 import 'HomePage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -23,6 +26,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +65,7 @@ class _LoginState extends State<Login> {
                   }
                   return null;
                 },
+                controller: usernameController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Username',
@@ -75,6 +81,7 @@ class _LoginState extends State<Login> {
                   }
                   return null;
                 },
+                controller: passController,
                 obscureText: true,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -96,12 +103,35 @@ class _LoginState extends State<Login> {
                 // });
                 // muda a cor do botao mas nao funciona
                 //},
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    Navigator.pushReplacement(
-                      //inserir autenticação aqui
-                        context,
-                        MaterialPageRoute(builder: (_) => HomePage()));
+                    final conn = await MySQLConnection.createConnection(
+                      host: dotenv.env['host'],
+                      port: int.parse(dotenv.env['port']!),
+                      userName: dotenv.env['username'].toString(),
+                      password: dotenv.env['password'].toString(),
+                      databaseName: dotenv.env['databaseName'], // optional
+                    );
+                    // actually connect to database
+                    await conn.connect();
+
+                    var user = usernameController.text;
+                    var pass = passController.text;
+                    //TODO vuneravel a injecao sql
+                    var result = await conn.execute(
+                        "SELECT username, password FROM account WHERE username='$user' and password='$pass';");
+                    for (final row in result.rows) {
+                      //TODO nao funciona
+                      if (result.length == 1) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => HomePage()));
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Adicionado com sucesso',textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),backgroundColor: Colors.red,));
+                          Navigator.of(context, rootNavigator: true).pop();
+                      }
+                    }
                   }
                 },
                 child: const Text(
