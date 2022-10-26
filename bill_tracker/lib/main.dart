@@ -25,6 +25,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
+  late String accID;
   final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passController = TextEditingController();
@@ -97,42 +98,31 @@ class _LoginState extends State<Login> {
               margin: const EdgeInsets.only(
                   left: 50, right: 50, top: 15, bottom: 15),
               child: TextButton(
-                //onHover: (hasFocus) {
-                // setState(() {
-                //   hasFocus ? Colors.pink : Colors.green;
-                // });
-                // muda a cor do botao mas nao funciona
-                //},
+                onHover: (hasFocus) {
+                 setState(() {
+                   if(hasFocus){
+                      color: Colors.pink;
+                    }else{
+                     color: Colors.green;
+                   }
+                 });
+                 //muda a cor do botao mas nao funciona
+                },
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final conn = await MySQLConnection.createConnection(
-                      host: dotenv.env['host'],
-                      port: int.parse(dotenv.env['port']!),
-                      userName: dotenv.env['username'].toString(),
-                      password: dotenv.env['password'].toString(),
-                      databaseName: dotenv.env['databaseName'], // optional
-                    );
-                    // actually connect to database
-                    await conn.connect();
-
-                    var user = usernameController.text;
-                    var pass = passController.text;
-                    //TODO vuneravel a injecao sql
-                    var result = await conn.execute(
-                        "SELECT username, password FROM account WHERE username='$user' and password='$pass';");
-                    for (final row in result.rows) {
-                      //TODO nao funciona
-                      if (result.length == 1) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => HomePage()));
-                      }else{
+                    bool access = await loginQuery();
+                    if (!mounted) return;
+                    if (access == true) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomePage(accID)));
+                    }else{
+                      //TODO crash here
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Adicionado com sucesso',textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),backgroundColor: Colors.red,));
-                          Navigator.of(context, rootNavigator: true).pop();
+                            const SnackBar(content: Text('Adicionado com sucesso',textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),backgroundColor: Colors.green,));
+                        Navigator.of(context, rootNavigator: true).pop();
                       }
                     }
-                  }
                 },
                 child: const Text(
                   'Login',
@@ -145,5 +135,31 @@ class _LoginState extends State<Login> {
       ),
     )
     );
+  }
+
+  Future<bool> loginQuery() async {
+    final conn = await MySQLConnection.createConnection(
+      host: dotenv.env['host'],
+      port: int.parse(dotenv.env['port']!),
+      userName: dotenv.env['username'].toString(),
+      password: dotenv.env['password'].toString(),
+      databaseName: dotenv.env['databaseName'], // optional
+    );
+    await conn.connect();
+
+    var user = usernameController.text;
+    var pass = passController.text;
+    //TODO vuneravel a injecao sql
+    //TODO Hash/salt password
+    var result = await conn.execute(
+        "SELECT * FROM account WHERE username='$user' and password='$pass';");
+    if(result.rows.length == 1){
+      for (final row in result.rows) {
+        accID = row.colByName("id")!;
+      }
+    }
+
+    conn.close();
+    return result.rows.length == 1;
   }
 }

@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:mysql_client/mysql_client.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class HomePage extends StatefulWidget {
+
+  HomePage(this.accID, {super.key});
+  String accID;
+
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
   //TODO buscar a base de dados
-  List<String> categoria = <String>['Categoria', 'One', 'Two', 'Three', 'Four'];
-  List<String> subcategoria = <String>['Sub-Categoria', 'Oqwe', 'Teqwewq', 'regre', 'jynyt'];
-  List<String> user = <String>['Nome', 'Rute', 'Rui', 'Pedro', 'Cristina'];
+  late List<String?> categoria = ["Categoria"];
+  late List<String?> subcategoria = ["Sub-Categoria"];
+  late List<String?> user = ["Nome"];
   late String categoriaSelected;
   late String subcategoriaSelected;
   late String userSelected;
@@ -44,10 +51,12 @@ class _HomePageState extends State<HomePage> {
                   // });
                   // muda a cor do botao mas nao funciona
                   //},
-                  onPressed: () {
+                  onPressed: () async {
                     categoriaSelected = "Categoria";
                     subcategoriaSelected = "Sub-Categoria";
                     userSelected = "Nome";
+                    //TODO NAO TA A DAR WAIT !!!!!!!!!!!!!!!!!!!!!1
+                    await getArrayDB();
                     showDialog(
                         context: context,
                         builder: (context) {
@@ -86,10 +95,10 @@ class _HomePageState extends State<HomePage> {
                                           },
                                           items: categoria
                                               .map<DropdownMenuItem<String>>(
-                                                  (String value) {
+                                                  (String? value) {
                                                 return DropdownMenuItem<String>(
                                                   value: value,
-                                                  child: Text(value),
+                                                  child: Text(value!),
                                                 );
                                               }).toList(),
                                         ),
@@ -113,10 +122,10 @@ class _HomePageState extends State<HomePage> {
                                           },
                                           items: subcategoria
                                               .map<DropdownMenuItem<String>>(
-                                                  (String value) {
+                                                  (String? value) {
                                                 return DropdownMenuItem<String>(
                                                   value: value,
-                                                  child: Text(value),
+                                                  child: Text(value!),
                                                 );
                                               }).toList(),
                                         ),
@@ -140,10 +149,10 @@ class _HomePageState extends State<HomePage> {
                                           },
                                           items: user
                                               .map<DropdownMenuItem<String>>(
-                                                  (String value) {
+                                                  (String? value) {
                                                 return DropdownMenuItem<String>(
                                                   value: value,
-                                                  child: Text(value),
+                                                  child: Text(value!),
                                                 );
                                               }).toList(),
                                         ),
@@ -237,10 +246,10 @@ class _HomePageState extends State<HomePage> {
                   // muda a cor do botao mas nao funciona
                   //},
                   onPressed: () {
-                    Navigator.push(
-                        //inserir autenticação aqui
-                        context,
-                        MaterialPageRoute(builder: (_) => HomePage()));
+                    //Navigator.push(
+                    //    //inserir autenticação aqui
+                    //    context,
+                    //    MaterialPageRoute(builder: (_) => HomePage()));
                   },
                   child: const Text(
                     'Consultar Despesas do Mês',
@@ -264,10 +273,10 @@ class _HomePageState extends State<HomePage> {
                   // muda a cor do botao mas nao funciona
                   //},
                   onPressed: () {
-                    Navigator.push(
-                        //inserir autenticação aqui
-                        context,
-                        MaterialPageRoute(builder: (_) => HomePage()));
+                    //Navigator.push(
+                    //    //inserir autenticação aqui
+                    //    context,
+                    //    MaterialPageRoute(builder: (_) => HomePage()));
                   },
                   child: const Text(
                     'Definições ????',
@@ -306,5 +315,35 @@ class _HomePageState extends State<HomePage> {
         )
       ]),
     );
+  }
+
+  Future<void> getArrayDB() async {
+    final conn = await MySQLConnection.createConnection(
+      host: dotenv.env['host'],
+      port: int.parse(dotenv.env['port']!),
+      userName: dotenv.env['username'].toString(),
+      password: dotenv.env['password'].toString(),
+      databaseName: dotenv.env['databaseName'], // optional
+    );
+    await conn.connect();
+
+    var result = await conn.execute(
+        "SELECT nome FROM user WHERE accountID='$widget.accID';");
+    for (final row in result.rows){
+      user.add(row.toString());
+    }
+    var result2 = await conn.execute(
+        "select nome, id, null from categoria where accountID = '$widget.accID' UNION select nome as nome2, null, id as id2 from subcategoria where categoriaID = categoriaid");
+    for (final row in result2.rows){
+      if(row.colByName("id") != "null"){
+        categoria.add(row.colByName("nome"));
+        String? id = row.colByName("id");
+        for(final row in result2.rows) {
+          if (row.colByName("NULL") == id) {
+            subcategoria.add(row.colByName("nome"));
+          }
+        }
+      }
+    }
   }
 }
