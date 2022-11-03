@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   late List<String?> categoria = ["Categoria"];
   late List<String?> subcategoria = ["Sub-Categoria"];
   late List<String?> user = ["Nome"];
-  final Map<String?, String?> subcatID = HashMap();
+  late final List<List<String?>> subcat = [["-1", "Sub-Categoria"]];
   final Map<String?, String?> catID = HashMap();
   late String categoriaSelected;
   late String subcategoriaSelected;
@@ -103,17 +103,16 @@ class _HomePageState extends State<HomePage> {
                                                 setState(() {
                                                   categoriaSelected = value!;
                                                 });
-                                                //TODO ????????????????????????????????????
-                                                if (categoriaSelected !=
-                                                    "Categoria") {
+                                                if (categoriaSelected !="Categoria") {
+                                                  //TODO e isto mas nao limpa o array
                                                   subcategoria = ["Sub-Categoria"];
                                                   catID.forEach((catid, catnome) {
                                                     if(catnome == categoriaSelected){
-                                                      subcatID.forEach((key, value) {
-                                                        if(subcatID[value] == catID[catid]) {
-                                                          subcategoria.add(subcatID[key]);
+                                                      for (var List in subcat) {
+                                                        if(List[0] == catid){
+                                                          subcategoria.add(List[1]);
                                                         }
-                                                      });
+                                                      }
                                                     }
                                                   });
                                                 }
@@ -394,15 +393,10 @@ class _HomePageState extends State<HomePage> {
     var result3 = await conn.execute(
         "select subcategoria.nome, subcategoria.categoriaID from subcategoria left join categoria d on subcategoria.categoriaID = d.id where accountID = 1");
     for (final row in result3.rows) {
-     subcatID.addAll({row.colByName("nome") : row.colByName("categoriaID")});
+     //subcatID.addAll({row.colByName("nome") : row.colByName("categoriaID")});
+      subcat.add([row.colByName("categoriaID"),row.colByName("nome")]);
     }
     conn.close();
-
-    print(catID.entries);
-    print(subcatID.entries);
-    print(subcatID.keys.firstWhere((k) => subcatID[k] == '2', orElse: () => null));
-    //TODO tens de ir buscar as keys pelo valor dos values do subcatID
-
   }
 }
 
